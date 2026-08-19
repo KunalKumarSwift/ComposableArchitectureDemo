@@ -45,7 +45,14 @@ let package = Package(
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
             ]
         ),
-        .testTarget(name: "AccountSummaryWidgetTests", dependencies: ["AccountSummaryWidget"]),
+        .testTarget(
+            name: "AccountSummaryWidgetTests",
+            dependencies: [
+                "AccountSummaryWidget",
+                "AccountSummaryWidgetInterface",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+            ]
+        ),
 
         // MARK: Recent Transactions widget
         .target(name: "RecentTransactionsWidgetInterface"),
@@ -57,7 +64,14 @@ let package = Package(
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
             ]
         ),
-        .testTarget(name: "RecentTransactionsWidgetTests", dependencies: ["RecentTransactionsWidget"]),
+        .testTarget(
+            name: "RecentTransactionsWidgetTests",
+            dependencies: [
+                "RecentTransactionsWidget",
+                "RecentTransactionsWidgetInterface",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+            ]
+        ),
 
         // MARK: Quick Actions widget
         .target(name: "QuickActionsWidgetInterface"),
@@ -69,7 +83,14 @@ let package = Package(
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
             ]
         ),
-        .testTarget(name: "QuickActionsWidgetTests", dependencies: ["QuickActionsWidget"]),
+        .testTarget(
+            name: "QuickActionsWidgetTests",
+            dependencies: [
+                "QuickActionsWidget",
+                "QuickActionsWidgetInterface",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+            ]
+        ),
 
         // MARK: Offers widget
         .target(name: "OffersWidgetInterface"),
@@ -81,7 +102,14 @@ let package = Package(
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
             ]
         ),
-        .testTarget(name: "OffersWidgetTests", dependencies: ["OffersWidget"]),
+        .testTarget(
+            name: "OffersWidgetTests",
+            dependencies: [
+                "OffersWidget",
+                "OffersWidgetInterface",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+            ]
+        ),
 
         // MARK: Home screen (composition root — layout + event bubbling only)
         .target(
@@ -95,7 +123,14 @@ let package = Package(
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
             ]
         ),
-        .testTarget(name: "HomeScreenTests", dependencies: ["HomeScreen"]),
+        .testTarget(
+            name: "HomeScreenTests",
+            dependencies: [
+                "HomeScreen",
+                "QuickActionsWidget",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+            ]
+        ),
 
         // MARK: App (composition root — wiring only, no feature logic)
         .executableTarget(
