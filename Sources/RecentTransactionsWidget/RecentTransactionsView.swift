@@ -39,7 +39,7 @@ public struct RecentTransactionsView: View {
                     }
                 } else {
                     ForEach(viewModel.transactions) { transaction in
-                        TransactionRowView(transaction: transaction)
+                        TransactionRowView(transaction: transaction, isBalanceRevealed: viewModel.isBalanceRevealed)
                     }
                 }
             }

@@ -29,8 +29,10 @@ BankingDemoApp (executable target — @main, wiring only)
         └── OffersWidget ────────── OffersWidgetInterface
 
 Every <Name>Widget also depends on DesignSystem (shared chrome: card
-container, skeleton loader, staleness banner). No widget depends on
-another widget — only HomeScreen sees more than one.
+container, skeleton loader, staleness banner). Account Summary and
+Recent Transactions additionally depend on SharedState (the balance
+reveal/hide toggle both need — see below). No widget depends on another
+widget — only HomeScreen sees more than one.
 ```
 
 One `Package.swift` with many targets, same reasoning as the TCA branch:
@@ -75,6 +77,45 @@ moves to its own package path unchanged.
   the way down; the widget itself only ever calls "the closure for this
   button," never a navigation API.
 
+## Sharing state across widgets
+
+Widget isolation is the default, but the PRD's balance-masking toggle
+(§7) is a case where two widgets legitimately need to agree: hiding
+balances on Account Summary should also mask amounts on Recent
+Transactions. Neither widget may import the other, so the shared piece
+of state — not the widgets — moves down to a new zero-dependency Core
+module, `SharedState`:
+
+```swift
+@Observable
+@MainActor
+public final class BalanceVisibility: Sendable {
+    public var isRevealed: Bool = true
+    public func toggle() { isRevealed.toggle() }
+}
+```
+
+`HomeScreenDependencies.live(...)` creates **one** instance and hands the
+same reference to both `AccountSummaryDependencies` and
+`RecentTransactionsDependencies`. Each view model exposes it as a
+computed `isBalanceRevealed` — Account Summary can also call
+`toggleBalanceVisibility()` — but only Account Summary's view renders the
+toggle button; Recent Transactions only ever reads it. Because
+`BalanceVisibility` is `@Observable`, toggling it from either widget
+re-renders every view reading it, in any widget, with no event bus and no
+parent reducer relaying the change. See
+`Tests/HomeScreenTests/SharedBalanceVisibilityTests.swift` for the
+cross-widget assertion, and its `now`-style default parameter (`= BalanceVisibility()`)
+that keeps every other widget test — which doesn't care about
+sharing — unaffected.
+
+This is a deliberate, narrow exception to "a widget only depends on its
+own Interface": it still holds, since neither widget depends on the
+other — both depend on a shared Core type instead, exactly the way both
+already depend on `DesignSystem`. Reach for this only for genuinely
+cross-cutting values; a widget's own loading/error/data state stays
+exactly where it was.
+
 ## Composition without a framework
 
 Rather than a reducer or a store, wiring is a chain of plain factory
@@ -83,10 +124,10 @@ methods, each hidden behind its own module boundary:
 ```
 AppView
   → HomeScreenDependencies.live(onTransferTapped:onPayBillTapped:onDepositTapped:)   [HomeScreen]
-      → AccountSummaryDependencies.live()        [AccountSummaryWidget]
-      → RecentTransactionsDependencies.live()    [RecentTransactionsWidget]
-      → QuickActionsDependencies.live(...)       [QuickActionsWidget]
-      → OffersDependencies.live()                [OffersWidget]
+      → AccountSummaryDependencies.live(balanceVisibility:)        [AccountSummaryWidget]
+      → RecentTransactionsDependencies.live(balanceVisibility:)    [RecentTransactionsWidget]
+      → QuickActionsDependencies.live(...)                         [QuickActionsWidget]
+      → OffersDependencies.live()                                  [OffersWidget]
 ```
 
 Each `.live()` factory is the one place a widget's module is allowed to

@@ -8,6 +8,7 @@ import Foundation
 import OffersWidget
 import QuickActionsWidget
 import RecentTransactionsWidget
+import SharedState
 
 /// Everything the Home screen needs to construct its four widgets.
 public struct HomeScreenDependencies: Sendable {
@@ -49,9 +50,13 @@ extension HomeScreenDependencies {
         onPayBillTapped: @escaping @Sendable () -> Void,
         onDepositTapped: @escaping @Sendable () -> Void
     ) -> HomeScreenDependencies {
-        HomeScreenDependencies(
-            accountSummary: .live(),
-            recentTransactions: .live(),
+        // One shared instance handed to every widget that needs to mask
+        // balances together — this is the one seam where two widgets'
+        // Dependencies structs intentionally reference the same object.
+        let balanceVisibility = BalanceVisibility()
+        return HomeScreenDependencies(
+            accountSummary: .live(balanceVisibility: balanceVisibility),
+            recentTransactions: .live(balanceVisibility: balanceVisibility),
             quickActions: .live(
                 onTransferTapped: onTransferTapped,
                 onPayBillTapped: onPayBillTapped,

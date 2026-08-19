@@ -16,6 +16,14 @@ public final class RecentTransactionsViewModel {
     public private(set) var lastError: RecentTransactionsError?
     public private(set) var lastUpdated: Date?
 
+    /// Whether amounts render as plain text or masked dots. This widget
+    /// only ever reads the shared toggle — the reveal/hide control itself
+    /// lives on Account Summary — so both widgets stay in sync without
+    /// this one depending on that one.
+    public var isBalanceRevealed: Bool {
+        dependencies.balanceVisibility.isRevealed
+    }
+
     /// Matches the "last 5" refresh policy from the widget inventory (PRD §5).
     private static let displayLimit: Int = 5
 

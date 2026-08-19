@@ -16,6 +16,7 @@ let package = Package(
     platforms: [.iOS(.v17)],
     products: [
         .library(name: "DesignSystem", targets: ["DesignSystem"]),
+        .library(name: "SharedState", targets: ["SharedState"]),
         .library(name: "AccountSummaryWidgetInterface", targets: ["AccountSummaryWidgetInterface"]),
         .library(name: "AccountSummaryWidget", targets: ["AccountSummaryWidget"]),
         .library(name: "RecentTransactionsWidgetInterface", targets: ["RecentTransactionsWidgetInterface"]),
@@ -29,22 +30,29 @@ let package = Package(
     targets: [
         // MARK: Core (zero internal dependencies)
         .target(name: "DesignSystem"),
+        .target(name: "SharedState"),
 
         // MARK: Account Summary widget
         .target(name: "AccountSummaryWidgetInterface"),
         .target(
             name: "AccountSummaryWidget",
-            dependencies: ["AccountSummaryWidgetInterface", "DesignSystem"]
+            dependencies: ["AccountSummaryWidgetInterface", "DesignSystem", "SharedState"]
         ),
-        .testTarget(name: "AccountSummaryWidgetTests", dependencies: ["AccountSummaryWidget", "AccountSummaryWidgetInterface"]),
+        .testTarget(
+            name: "AccountSummaryWidgetTests",
+            dependencies: ["AccountSummaryWidget", "AccountSummaryWidgetInterface", "SharedState"]
+        ),
 
         // MARK: Recent Transactions widget
         .target(name: "RecentTransactionsWidgetInterface"),
         .target(
             name: "RecentTransactionsWidget",
-            dependencies: ["RecentTransactionsWidgetInterface", "DesignSystem"]
+            dependencies: ["RecentTransactionsWidgetInterface", "DesignSystem", "SharedState"]
         ),
-        .testTarget(name: "RecentTransactionsWidgetTests", dependencies: ["RecentTransactionsWidget", "RecentTransactionsWidgetInterface"]),
+        .testTarget(
+            name: "RecentTransactionsWidgetTests",
+            dependencies: ["RecentTransactionsWidget", "RecentTransactionsWidgetInterface", "SharedState"]
+        ),
 
         // MARK: Quick Actions widget
         .target(name: "QuickActionsWidgetInterface"),
@@ -71,6 +79,7 @@ let package = Package(
                 "QuickActionsWidget",
                 "OffersWidget",
                 "DesignSystem",
+                "SharedState",
             ]
         ),
         .testTarget(
@@ -85,6 +94,7 @@ let package = Package(
                 "QuickActionsWidgetInterface",
                 "OffersWidget",
                 "OffersWidgetInterface",
+                "SharedState",
             ]
         ),
 

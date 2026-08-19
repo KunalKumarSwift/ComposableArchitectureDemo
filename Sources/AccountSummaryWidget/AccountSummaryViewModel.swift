@@ -15,7 +15,14 @@ public final class AccountSummaryViewModel {
     public private(set) var isLoading: Bool = false
     public private(set) var lastError: AccountSummaryError?
     public private(set) var lastUpdated: Date?
-    public private(set) var isBalanceRevealed: Bool = true
+
+    /// Whether balances render as plain text or masked dots. Reads through
+    /// to the shared ``SharedState/BalanceVisibility`` instance, so toggling
+    /// it here is visible to any other widget holding the same instance
+    /// (e.g. Recent Transactions).
+    public var isBalanceRevealed: Bool {
+        dependencies.balanceVisibility.isRevealed
+    }
 
     private let dependencies: AccountSummaryDependencies
 
@@ -39,8 +46,10 @@ public final class AccountSummaryViewModel {
         isLoading = false
     }
 
-    /// Flips whether balances render as plain text or masked dots.
+    /// Flips whether balances render as plain text or masked dots, for
+    /// this widget and every other widget sharing the same
+    /// ``SharedState/BalanceVisibility`` instance.
     public func toggleBalanceVisibility() {
-        isBalanceRevealed.toggle()
+        dependencies.balanceVisibility.toggle()
     }
 }
